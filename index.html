@@ -858,8 +858,9 @@
     <script>
         // Глобальные переменные
         let currentData = {};
-        let history = [        // Пересчитываем прибыль для демо-данных
-        history[0].profit = calculateMetrics(history[0].data).netProfit;
+        let history = [];  // will hold saved calculations
+        // Если будут демо-данные, можно пересчитать прибыль так:
+        // if (history[0]) history[0].profit = calculateMetrics(history[0].data).netProfit;
         let profitChart, funnelChart, channelsChart, scenarioChart, roiChart;
 
         // Каналы и их настройки
