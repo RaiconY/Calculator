@@ -5,20 +5,17 @@
         let profitChart, funnelChart, channelsChart, scenarioChart, roiChart;
 
         // Загрузка сценариев из localStorage или установка значений по умолчанию
-        let scenarios = JSON.parse(localStorage.getItem('scenarios') || 'null');
-        if (!scenarios) {
-            scenarios = [
-                {
-                    name: 'Базовый рост',
-                    values: { organicGrowth: 20, adBudget: 10, conversionChange: 5, checkChange: 0 }
-                },
-                {
-                    name: 'Экспансия',
-                    values: { organicGrowth: 100, adBudget: 100, conversionChange: 20, checkChange: 10 }
-                }
-            ];
-            localStorage.setItem('scenarios', JSON.stringify(scenarios));
-        }
+        const defaultScenarios = [
+            {
+                name: 'Базовый рост',
+                values: { organicGrowth: 20, adBudget: 10, conversionChange: 5, checkChange: 0 }
+            },
+            {
+                name: 'Экспансия',
+                values: { organicGrowth: 100, adBudget: 100, conversionChange: 20, checkChange: 10 }
+            }
+        ];
+        let scenarios = ScenarioManager.initScenarios(defaultScenarios);
 
         // Каналы и их настройки
         const channels = {
@@ -532,20 +529,13 @@
                 checkChange: parseFloat(document.getElementById('check-change').value) || 0
             };
 
-            const existing = scenarios.find(s => s.name === name);
-            if (existing) {
-                existing.values = values;
-            } else {
-                scenarios.push({ name, values });
-            }
-
-            localStorage.setItem('scenarios', JSON.stringify(scenarios));
+            ScenarioManager.saveScenario(scenarios, name, values);
             updateScenarioSelect();
             const index = scenarios.findIndex(s => s.name === name);
             document.getElementById('scenario-select').value = index;
         }
 
-        function switchTab(tabName) {
+        function switchTab(event, tabName) {
             document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
             
