@@ -704,7 +704,7 @@
                     tproger: { coverage: 0, conversion: 0, cost: 0 },
                     proglib: { coverage: 0, conversion: 0, cost: 0 },
                     instagram_organic: { coverage: 3000, conversion: 1.5, cost: 0 },
-                    instagram: { coverage: 0, conversion: 0, cost: 0 },
+                    instagram: { coverage: 0, conversion: 0, cost: 500 },
                     leadmagnet: { coverage: 0, conversion: 0, cost: 0 },
                     other: { coverage: 0, conversion: 0, cost: 0 }
                 },
