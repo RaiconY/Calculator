@@ -672,7 +672,7 @@
             document.getElementById('calculator').classList.add('active');
         }
 
-        // Если история пуста, добавляем предзаполненный пример
+        // Если история пуста, добавляем предзаполненные примеры
         if (history.length === 0) {
             const todayData = {
                 channels: {
@@ -695,19 +695,52 @@
                 taxRate: 6
             };
 
-            const metrics = calculateMetrics(todayData);
-            const item = {
+            const goalData = {
+                channels: {
+                    habr: { coverage: 124000, conversion: 5, cost: 0 },
+                    pikabu: { coverage: 114000, conversion: 4, cost: 0 },
+                    vc: { coverage: 20000, conversion: 2.5, cost: 0 },
+                    tproger: { coverage: 20000, conversion: 2.5, cost: 0 },
+                    proglib: { coverage: 20000, conversion: 2.5, cost: 0 },
+                    instagram_organic: { coverage: 600000, conversion: 1.5, cost: 0 },
+                    instagram: { coverage: 100000, conversion: 2, cost: 50000 },
+                    leadmagnet: { coverage: 0, conversion: 0, cost: 0 },
+                    other: { coverage: 0, conversion: 0, cost: 0 }
+                },
+                convToPayment: 2.5,
+                convToPurchase: 70,
+                avgCheck: 4990,
+                otherIncome: 0,
+                opExpenses: 0,
+                subscriptions: 0,
+                taxRate: 6
+            };
+
+            const todayMetrics = calculateMetrics(todayData);
+            const todayItem = {
                 id: Date.now(),
                 name: 'Цифры на сегодня',
                 description: '',
                 date: new Date().toLocaleDateString('ru-RU'),
                 data: todayData,
-                metrics,
-                profit: metrics.netProfit
+                metrics: todayMetrics,
+                profit: todayMetrics.netProfit
             };
-            history.push(item);
+
+            const goalMetrics = calculateMetrics(goalData);
+            const goalItem = {
+                id: Date.now() + 1,
+                name: 'Цель',
+                description: '',
+                date: new Date().toLocaleDateString('ru-RU'),
+                data: goalData,
+                metrics: goalMetrics,
+                profit: goalMetrics.netProfit
+            };
+
+            history.push(todayItem, goalItem);
             localStorage.setItem('history', JSON.stringify(history));
-            loadCalculation(item.id);
+            loadCalculation(todayItem.id);
         }
 
         // Обработчики для слайдеров сценариев
