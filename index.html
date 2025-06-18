@@ -312,7 +312,7 @@
             <form class="save-form" onsubmit="confirmSave(event)">
                 <input type="text" id="saveName" placeholder="Название расчета" required>
                 <input type="text" id="saveDescription" placeholder="Описание (опционально)">
-                <p style="font-size: 12px; color: #666; margin: 10px 0;">⚠️ Данные сохраняются только на время текущей сессии</p>
+                <p style="font-size: 12px; color: #666; margin: 10px 0;">⚠️ Данные сохраняются в <code>localStorage</code> вашего браузера и будут доступны после перезагрузки.</p>
                 <button type="submit" class="btn btn-primary" style="width: 100%;">Сохранить</button>
             </form>
         </div>
