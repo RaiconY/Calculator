@@ -19,11 +19,11 @@
         </div>
 
         <div class="tabs">
-            <div class="tab active" onclick="switchTab('calculator')">📊 Калькулятор</div>
-            <div class="tab" onclick="switchTab('analytics')">📈 Аналитика</div>
-            <div class="tab" onclick="switchTab('roi')">💰 ROI каналов</div>
-            <div class="tab" onclick="switchTab('scenarios')">🎯 Сценарии</div>
-            <div class="tab" onclick="switchTab('history')">📜 История</div>
+            <div class="tab active" onclick="switchTab(event, 'calculator')">📊 Калькулятор</div>
+            <div class="tab" onclick="switchTab(event, 'analytics')">📈 Аналитика</div>
+            <div class="tab" onclick="switchTab(event, 'roi')">💰 ROI каналов</div>
+            <div class="tab" onclick="switchTab(event, 'scenarios')">🎯 Сценарии</div>
+            <div class="tab" onclick="switchTab(event, 'history')">📜 История</div>
         </div>
 
         <div id="calculator" class="tab-content active">
