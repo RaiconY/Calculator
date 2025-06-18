@@ -672,6 +672,44 @@
             document.getElementById('calculator').classList.add('active');
         }
 
+        // Если история пуста, добавляем предзаполненный пример
+        if (history.length === 0) {
+            const todayData = {
+                channels: {
+                    habr: { coverage: 24000, conversion: 5, cost: 0 },
+                    pikabu: { coverage: 4000, conversion: 4, cost: 0 },
+                    vc: { coverage: 1000, conversion: 2.5, cost: 0 },
+                    tproger: { coverage: 0, conversion: 0, cost: 0 },
+                    proglib: { coverage: 0, conversion: 0, cost: 0 },
+                    instagram_organic: { coverage: 3000, conversion: 1.5, cost: 0 },
+                    instagram: { coverage: 0, conversion: 0, cost: 0 },
+                    leadmagnet: { coverage: 0, conversion: 0, cost: 0 },
+                    other: { coverage: 0, conversion: 0, cost: 0 }
+                },
+                convToPayment: 1.2,
+                convToPurchase: 80,
+                avgCheck: 4990,
+                otherIncome: 0,
+                opExpenses: 0,
+                subscriptions: 0,
+                taxRate: 6
+            };
+
+            const metrics = calculateMetrics(todayData);
+            const item = {
+                id: Date.now(),
+                name: 'Цифры на сегодня',
+                description: '',
+                date: new Date().toLocaleDateString('ru-RU'),
+                data: todayData,
+                metrics,
+                profit: metrics.netProfit
+            };
+            history.push(item);
+            localStorage.setItem('history', JSON.stringify(history));
+            loadCalculation(item.id);
+        }
+
         // Обработчики для слайдеров сценариев
         document.getElementById('organic-growth').addEventListener('input', function() {
             document.getElementById('organic-growth-value').textContent = this.value + '%';
