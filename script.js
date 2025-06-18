@@ -3,6 +3,7 @@
         // Если будут демо-данные, можно пересчитать прибыль так:
         // if (history[0]) history[0].profit = calculateMetrics(history[0].data).netProfit;
         let profitChart, funnelChart, channelsChart, scenarioChart, roiChart;
+        let profitChartVisible = true;
 
         // Загрузка сценариев из localStorage или установка значений по умолчанию
         const defaultScenarios = [
@@ -551,6 +552,27 @@
             }
         }
 
+        function toggleProfitChart() {
+            const container = document.getElementById('profitChartContainer');
+            const btn = document.getElementById('toggleProfitChartBtn');
+            if (!container || !btn) return;
+
+            if (profitChartVisible) {
+                container.style.display = 'none';
+                btn.textContent = 'Показать';
+                if (profitChart) {
+                    profitChart.destroy();
+                    profitChart = null;
+                }
+            } else {
+                container.style.display = '';
+                btn.textContent = 'Скрыть';
+                calculate();
+            }
+
+            profitChartVisible = !profitChartVisible;
+        }
+
         function saveData() {
             document.getElementById('saveModal').style.display = 'flex';
         }
@@ -781,6 +803,7 @@
 
         // Первоначальный расчет
         calculate();
+        toggleProfitChart();
         updateHistoryList();
         updateScenarioSelect();
         if (document.getElementById('scenario-select').options.length > 0) {
