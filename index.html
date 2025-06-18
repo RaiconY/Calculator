@@ -19,11 +19,11 @@
         </div>
 
         <div class="tabs">
-            <div class="tab active" onclick="switchTab('calculator')">📊 Калькулятор</div>
-            <div class="tab" onclick="switchTab('analytics')">📈 Аналитика</div>
-            <div class="tab" onclick="switchTab('roi')">💰 ROI каналов</div>
-            <div class="tab" onclick="switchTab('scenarios')">🎯 Сценарии</div>
-            <div class="tab" onclick="switchTab('history')">📜 История</div>
+            <div class="tab active" onclick="switchTab(event, 'calculator')">📊 Калькулятор</div>
+            <div class="tab" onclick="switchTab(event, 'analytics')">📈 Аналитика</div>
+            <div class="tab" onclick="switchTab(event, 'roi')">💰 ROI каналов</div>
+            <div class="tab" onclick="switchTab(event, 'scenarios')">🎯 Сценарии</div>
+            <div class="tab" onclick="switchTab(event, 'history')">📜 История</div>
         </div>
 
         <div id="calculator" class="tab-content active">
@@ -239,6 +239,10 @@
             <div style="padding: 25px; height: calc(100vh - 250px); overflow-y: auto; min-height: 700px;">
                 <div class="scenario-panel">
                     <h3>🎯 Анализ "Что если"</h3>
+                    <div class="scenario-select">
+                        <select id="scenario-select"></select>
+                        <button class="btn btn-primary" onclick="saveCurrentScenario()">Сохранить</button>
+                    </div>
                     <div class="scenario-controls">
                         <div class="scenario-slider">
                             <label>
@@ -330,6 +334,7 @@
         </div>
     </div>
 
+    <script src="scenarios.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
