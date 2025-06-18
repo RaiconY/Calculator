@@ -59,9 +59,27 @@
             font-weight: 600;
         }
 
-        .btn-primary {
-            background: white;
-            color: #667eea;
+.btn-primary {
+    background: white;
+    color: #667eea;
+}
+
+.btn-secondary {
+    background: #e0e0e0;
+    color: #333;
+}
+
+.btn-secondary:hover {
+    background: #d5d5d5;
+}
+
+        .btn-secondary {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #d5d5d5;
         }
 
         .btn-primary:hover {
@@ -366,6 +384,19 @@
             padding: 20px;
             border-radius: 15px;
             margin-bottom: 20px;
+        }
+
+        .scenario-select {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .scenario-select select {
+            flex: 1;
+            padding: 6px 8px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
         }
 
         .scenario-controls {

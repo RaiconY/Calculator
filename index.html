@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Калькулятор бизнес-метрик Pro</title>
+    <title>Калькулятор бизнес-метрик</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>Калькулятор бизнес-метрик Pro</h1>
+            <h1>Калькулятор бизнес-метрик</h1>
             <p>Полный анализ с индивидуальными конверсиями по каналам</p>
             <div class="header-actions">
                 <button class="btn btn-primary" onclick="saveData()">💾 Сохранить</button>
@@ -19,11 +19,11 @@
         </div>
 
         <div class="tabs">
-            <div class="tab active" onclick="switchTab('calculator')">📊 Калькулятор</div>
-            <div class="tab" onclick="switchTab('analytics')">📈 Аналитика</div>
-            <div class="tab" onclick="switchTab('roi')">💰 ROI каналов</div>
-            <div class="tab" onclick="switchTab('scenarios')">🎯 Сценарии</div>
-            <div class="tab" onclick="switchTab('history')">📜 История</div>
+            <div class="tab active" onclick="switchTab(event, 'calculator')">📊 Калькулятор</div>
+            <div class="tab" onclick="switchTab(event, 'analytics')">📈 Аналитика</div>
+            <div class="tab" onclick="switchTab(event, 'roi')">💰 ROI каналов</div>
+            <div class="tab" onclick="switchTab(event, 'scenarios')">🎯 Сценарии</div>
+            <div class="tab" onclick="switchTab(event, 'history')">📜 История</div>
         </div>
 
         <div id="calculator" class="tab-content active">
@@ -201,8 +201,10 @@
 
         <div id="analytics" class="tab-content">
             <div style="padding: 25px; height: calc(100vh - 160px); overflow-y: auto;">
-                <div class="chart-container">
-                    <h3>📈 Динамика прибыли по месяцам</h3>
+                <div class="chart-container" id="profitChartContainer">
+                    <h3>📈 Динамика прибыли по месяцам
+                        <button class="btn btn-secondary" id="toggleProfitChartBtn" onclick="toggleProfitChart()" style="margin-left:10px;">Скрыть</button>
+                    </h3>
                     <div class="chart-wrapper">
                         <canvas id="profitChart"></canvas>
                     </div>
@@ -239,6 +241,10 @@
             <div style="padding: 25px; height: calc(100vh - 250px); overflow-y: auto; min-height: 700px;">
                 <div class="scenario-panel">
                     <h3>🎯 Анализ "Что если"</h3>
+                    <div class="scenario-select">
+                        <select id="scenario-select"></select>
+                        <button class="btn btn-primary" onclick="saveCurrentScenario()">Сохранить</button>
+                    </div>
                     <div class="scenario-controls">
                         <div class="scenario-slider">
                             <label>
@@ -312,7 +318,7 @@
             <form class="save-form" onsubmit="confirmSave(event)">
                 <input type="text" id="saveName" placeholder="Название расчета" required>
                 <input type="text" id="saveDescription" placeholder="Описание (опционально)">
-                <p style="font-size: 12px; color: #666; margin: 10px 0;">⚠️ Данные сохраняются только на время текущей сессии</p>
+                <p style="font-size: 12px; color: #666; margin: 10px 0;">⚠️ Данные сохраняются в <code>localStorage</code> вашего браузера и будут доступны после перезагрузки.</p>
                 <button type="submit" class="btn btn-primary" style="width: 100%;">Сохранить</button>
             </form>
         </div>
@@ -330,6 +336,7 @@
         </div>
     </div>
 
+    <script src="scenarios.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
