@@ -201,8 +201,10 @@
 
         <div id="analytics" class="tab-content">
             <div style="padding: 25px; height: calc(100vh - 160px); overflow-y: auto;">
-                <div class="chart-container">
-                    <h3>📈 Динамика прибыли по месяцам</h3>
+                <div class="chart-container" id="profitChartContainer">
+                    <h3>📈 Динамика прибыли по месяцам
+                        <button class="btn btn-secondary" id="toggleProfitChartBtn" onclick="toggleProfitChart()" style="margin-left:10px;">Скрыть</button>
+                    </h3>
                     <div class="chart-wrapper">
                         <canvas id="profitChart"></canvas>
                     </div>

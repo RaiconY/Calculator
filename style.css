@@ -59,10 +59,19 @@
             font-weight: 600;
         }
 
-        .btn-primary {
-            background: white;
-            color: #667eea;
-        }
+.btn-primary {
+    background: white;
+    color: #667eea;
+}
+
+.btn-secondary {
+    background: #e0e0e0;
+    color: #333;
+}
+
+.btn-secondary:hover {
+    background: #d5d5d5;
+}
 
         .btn-primary:hover {
             transform: translateY(-2px);
