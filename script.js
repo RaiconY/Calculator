@@ -18,32 +18,6 @@
         ];
         let scenarios = ScenarioManager.initScenarios(defaultScenarios);
 
-        // Загрузка сценариев из localStorage или установка значений по умолчанию
-        const defaultScenarios = [
-            {
-                name: 'Базовый рост',
-                values: { organicGrowth: 20, adBudget: 10, conversionChange: 5, checkChange: 0 }
-            },
-            {
-                name: 'Экспансия',
-                values: { organicGrowth: 100, adBudget: 100, conversionChange: 20, checkChange: 10 }
-            }
-        ];
-        let scenarios = ScenarioManager.initScenarios(defaultScenarios);
-
-        // Загрузка сценариев из localStorage или установка значений по умолчанию
-        const defaultScenarios = [
-            {
-                name: 'Базовый рост',
-                values: { organicGrowth: 20, adBudget: 10, conversionChange: 5, checkChange: 0 }
-            },
-            {
-                name: 'Экспансия',
-                values: { organicGrowth: 100, adBudget: 100, conversionChange: 20, checkChange: 10 }
-            }
-        ];
-        let scenarios = ScenarioManager.initScenarios(defaultScenarios);
-
         // Каналы и их настройки
         const channels = {
             habr: { name: 'Хабр', type: 'organic' },
