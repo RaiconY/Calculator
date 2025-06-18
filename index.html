@@ -1,0 +1,1515 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Калькулятор бизнес-метрик Pro</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 10px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            min-height: 98vh;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 25px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 26px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .header-actions {
+            position: absolute;
+            right: 25px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            padding: 7px 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background: white;
+            color: #667eea;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            padding: 0 30px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .tab:hover {
+            color: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: 540px 1fr;
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .input-panel {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 22px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            height: calc(100vh - 160px);
+            overflow-y: auto;
+        }
+
+        .section {
+            margin-bottom: 15px;
+            padding-top: 3px;
+        }
+
+        .section h3 {
+            color: #333;
+            font-size: 17px;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .channel-group {
+            background: white;
+            padding: 10px 12px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .channel-group h4 {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .channel-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .input-group {
+            margin-bottom: 8px;
+        }
+
+        .input-group label {
+            display: block;
+            color: #555;
+            font-size: 13px;
+            margin-bottom: 4px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 10px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .small-input {
+            padding: 6px 10px !important;
+            font-size: 14px !important;
+        }
+
+        .visualization {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            height: calc(100vh - 160px);
+            overflow-y: auto;
+        }
+
+        .tree {
+            font-size: 14px;
+            line-height: 1.8;
+            color: #333;
+        }
+
+        .tree-node {
+            margin: 5px 0;
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: all 0.3s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .tree-node:hover {
+            transform: translateX(5px);
+        }
+
+        .level-0 {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+            margin-top: 20px;
+        }
+
+        .level-1 {
+            background: #e3f2fd;
+            margin-left: 20px;
+            border-left: 3px solid #667eea;
+        }
+
+        .level-2 {
+            background: #f3e5f5;
+            margin-left: 40px;
+            border-left: 3px solid #764ba2;
+        }
+
+        .level-3 {
+            background: #e8f5e9;
+            margin-left: 60px;
+            border-left: 3px solid #4caf50;
+        }
+
+        .level-4 {
+            background: #fff3e0;
+            margin-left: 80px;
+            border-left: 3px solid #ff9800;
+        }
+
+        .node-value {
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .node-formula {
+            font-size: 11px;
+            color: #666;
+            font-style: italic;
+            margin-top: 3px;
+        }
+
+        .kpi-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .kpi-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .kpi-label {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+
+        .kpi-value {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .chart-container {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            height: 300px;
+            position: relative;
+        }
+
+        .chart-container h3 {
+            margin-bottom: 15px;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 250px;
+        }
+
+        .roi-table {
+            width: 100%;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+        }
+
+        .roi-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .roi-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .roi-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .roi-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .roi-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .roi-positive {
+            color: #4caf50;
+            font-weight: bold;
+        }
+
+        .roi-negative {
+            color: #f44336;
+            font-weight: bold;
+        }
+
+        .scenario-panel {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .scenario-controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .scenario-slider {
+            margin-bottom: 15px;
+        }
+
+        .scenario-slider label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .scenario-slider input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #e0e0e0;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .scenario-slider input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+        }
+
+        .history-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .history-item {
+            background: #f8f9fa;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .history-item:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+
+        .history-date {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .history-profit {
+            font-weight: bold;
+            color: #4caf50;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-close {
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .save-form input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .header-actions {
+                position: static;
+                transform: none;
+                margin-top: 15px;
+                justify-content: center;
+            }
+
+            .tabs {
+                overflow-x: auto;
+                padding: 0 15px;
+            }
+
+            .channel-inputs {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .animate-change {
+            animation: pulse 0.5s ease-in-out;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); background-color: rgba(102, 126, 234, 0.2); }
+            100% { transform: scale(1); }
+        }
+
+        .result-highlight {
+            background: linear-gradient(135deg, #4caf50 0%, #8bc34a 100%) !important;
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(76, 175, 80, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Калькулятор бизнес-метрик Pro</h1>
+            <p>Полный анализ с индивидуальными конверсиями по каналам</p>
+            <div class="header-actions">
+                <button class="btn btn-primary" onclick="saveData()">💾 Сохранить</button>
+                <button class="btn btn-primary" onclick="loadDataModal()">📂 Загрузить</button>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('calculator')">📊 Калькулятор</div>
+            <div class="tab" onclick="switchTab('analytics')">📈 Аналитика</div>
+            <div class="tab" onclick="switchTab('roi')">💰 ROI каналов</div>
+            <div class="tab" onclick="switchTab('scenarios')">🎯 Сценарии</div>
+            <div class="tab" onclick="switchTab('history')">📜 История</div>
+        </div>
+
+        <div id="calculator" class="tab-content active">
+            <div class="content">
+                <div class="input-panel">
+                    <div class="section">
+                        <h3>📊 Каналы трафика</h3>
+                        
+                        <div class="channel-group">
+                            <h4>📝 Статьи (органика)</h4>
+                            <p style="font-size: 11px; color: #666; margin-bottom: 8px;">Конверсия из просмотра статьи в переход на сайт</p>
+                            <div class="channel-inputs">
+                                <div class="input-group">
+                                    <label>Хабр (охваты)</label>
+                                    <input type="number" id="habr" class="small-input" value="2000" min="0">
+                                </div>
+                                <div class="input-group">
+                                    <label>Конверсия в клик %</label>
+                                    <input type="number" id="habr_conv" class="small-input" value="2" min="0" max="100" step="0.1">
+                                </div>
+                                <div class="input-group">
+                                    <label>Пикабу (охваты)</label>
+                                    <input type="number" id="pikabu" class="small-input" value="1500" min="0">
+                                </div>
+                                <div class="input-group">
+                                    <label>Конверсия в клик %</label>
+                                    <input type="number" id="pikabu_conv" class="small-input" value="1.8" min="0" max="100" step="0.1">
+                                </div>
+                                <div class="input-group">
+                                    <label>VC (охваты)</label>
+                                    <input type="number" id="vc" class="small-input" value="1000" min="0">
+                                </div>
+                                <div class="input-group">
+                                    <label>Конверсия в клик %</label>
+                                    <input type="number" id="vc_conv" class="small-input" value="2.5" min="0" max="100" step="0.1">
+                                </div>
+                                <div class="input-group">
+                                    <label>tProger (охваты)</label>
+                                    <input type="number" id="tproger" class="small-input" value="800" min="0">
+                                </div>
+                                <div class="input-group">
+                                    <label>Конверсия в клик %</label>
+                                    <input type="number" id="tproger_conv" class="small-input" value="3" min="0" max="100" step="0.1">
+                                </div>
+                                <div class="input-group">
+                                    <label>Proglib (охваты)</label>
+                                    <input type="number" id="proglib" class="small-input" value="700" min="0">
+                                </div>
+                                <div class="input-group">
+                                    <label>Конверсия в клик %</label>
+                                    <input type="number" id="proglib_conv" class="small-input" value="2.2" min="0" max="100" step="0.1">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="channel-group">
+                            <h4>📱 Соцсети (органика)</h4>
+                            <div class="channel-inputs">
+                                <div class="input-group">
+                                    <label>Instagram (охваты)</label>
+                                    <input type="number" id="instagram_organic" class="small-input" value="3000" min="0">
+                                </div>
+                                <div class="input-group">
+                                    <label>Конверсия в клик %</label>
+                                    <input type="number" id="instagram_organic_conv" class="small-input" value="1.5" min="0" max="100" step="0.1">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="channel-group">
+                            <h4>💰 Реклама</h4>
+                            <div class="channel-inputs">
+                                <div class="input-group">
+                                    <label>Инста рилс (охваты)</label>
+                                    <input type="number" id="instagram" class="small-input" value="5000" min="0">
+                                </div>
+                                <div class="input-group">
+                                    <label>Конверсия в клик %</label>
+                                    <input type="number" id="instagram_conv" class="small-input" value="0.5" min="0" max="100" step="0.1">
+                                </div>
+                                <div class="input-group">
+                                    <label>Затраты на рекламу ₽</label>
+                                    <input type="number" id="instagram_cost" class="small-input" value="2000" min="0">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="channel-group">
+                            <h4>🎯 Прямой трафик</h4>
+                            <div class="channel-inputs">
+                                <div class="input-group">
+                                    <label>Лид-магнит (визиты)</label>
+                                    <input type="number" id="leadmagnet" class="small-input" value="300" min="0">
+                                </div>
+                                <div class="input-group">
+                                    <label>Конверсия в клик %</label>
+                                    <input type="number" id="leadmagnet_conv" class="small-input" value="5" min="0" max="100" step="0.1">
+                                </div>
+                                <div class="input-group">
+                                    <label>Другие источники</label>
+                                    <input type="number" id="other" class="small-input" value="200" min="0">
+                                </div>
+                                <div class="input-group">
+                                    <label>Конверсия в клик %</label>
+                                    <input type="number" id="other_conv" class="small-input" value="3" min="0" max="100" step="0.1">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <h3>🛒 Воронка продаж (%)</h3>
+                        <p style="font-size: 11px; color: #666; margin-bottom: 10px; line-height: 1.4;">
+                            1️⃣ Посетитель на сайте → 2️⃣ Нажимает "Купить" → 3️⃣ Вводит данные карты и платит
+                        </p>
+                        <div class="input-group">
+                            <label>% посетителей нажавших "Купить"</label>
+                            <input type="number" id="convToPayment" value="5" min="0" max="100" step="0.1">
+                        </div>
+                        <div class="input-group">
+                            <label>% оплативших на странице оплаты</label>
+                            <input type="number" id="convToPurchase" value="40" min="0" max="100" step="0.1">
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <h3>💰 Финансы</h3>
+                        <div class="input-group">
+                            <label>Средний чек (₽)</label>
+                            <input type="number" id="avgCheck" value="5000" min="0">
+                        </div>
+                        <div class="input-group">
+                            <label>Доход с других продуктов (₽)</label>
+                            <input type="number" id="otherIncome" value="15000" min="0">
+                        </div>
+                        <div class="input-group">
+                            <label>Операционные расходы (₽)</label>
+                            <input type="number" id="opExpenses" value="8000" min="0">
+                        </div>
+                        <div class="input-group">
+                            <label>Подписки (₽)</label>
+                            <input type="number" id="subscriptions" value="2000" min="0">
+                        </div>
+                        <div class="input-group">
+                            <label>Налоги (% от дохода)</label>
+                            <input type="number" id="taxes" value="6" min="0" max="100" step="0.1">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="visualization">
+                    <div class="kpi-cards">
+                        <div class="kpi-card">
+                            <div class="kpi-label">Чистая прибыль</div>
+                            <div class="kpi-value" id="kpi-profit">₽0</div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-label">Общий ROI</div>
+                            <div class="kpi-value" id="kpi-roi">0%</div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-label">Трафик на сайт</div>
+                            <div class="kpi-value" id="kpi-traffic">0</div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-label">Количество продаж</div>
+                            <div class="kpi-value" id="kpi-sales">0</div>
+                        </div>
+                    </div>
+                    <h3 style="margin-bottom: 20px; color: #333;">📊 Дерево метрик</h3>
+                    <div id="tree" class="tree"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="analytics" class="tab-content">
+            <div style="padding: 25px; height: calc(100vh - 160px); overflow-y: auto;">
+                <div class="chart-container">
+                    <h3>📈 Динамика прибыли по месяцам</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="profitChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <h3>🎯 Воронка конверсий по каналам</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="funnelChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <h3>📊 Эффективность каналов (трафик)</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="channelsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="roi" class="tab-content">
+            <div style="padding: 25px; height: calc(100vh - 250px); overflow-y: auto; min-height: 700px;">
+                <h3 style="margin-bottom: 20px;">💰 ROI по каналам</h3>
+                <div id="roi-table-container"></div>
+                <div class="chart-container">
+                    <h3>📊 Сравнение ROI каналов</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="roiChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="scenarios" class="tab-content">
+            <div style="padding: 25px; height: calc(100vh - 250px); overflow-y: auto; min-height: 700px;">
+                <div class="scenario-panel">
+                    <h3>🎯 Анализ "Что если"</h3>
+                    <div class="scenario-controls">
+                        <div class="scenario-slider">
+                            <label>
+                                <span>Рост органического трафика</span>
+                                <span id="organic-growth-value">0%</span>
+                            </label>
+                            <input type="range" id="organic-growth" min="-50" max="200" value="0" step="10">
+                        </div>
+                        <div class="scenario-slider">
+                            <label>
+                                <span>Изменение рекламного бюджета</span>
+                                <span id="ad-budget-value">0%</span>
+                            </label>
+                            <input type="range" id="ad-budget" min="-100" max="300" value="0" step="10">
+                        </div>
+                        <div class="scenario-slider">
+                            <label>
+                                <span>Изменение конверсий</span>
+                                <span id="conversion-change-value">0%</span>
+                            </label>
+                            <input type="range" id="conversion-change" min="-50" max="100" value="0" step="5">
+                        </div>
+                        <div class="scenario-slider">
+                            <label>
+                                <span>Изменение среднего чека</span>
+                                <span id="check-change-value">0%</span>
+                            </label>
+                            <input type="range" id="check-change" min="-50" max="100" value="0" step="5">
+                        </div>
+                    </div>
+                    <div class="kpi-cards">
+                        <div class="kpi-card">
+                            <div class="kpi-label">Текущая прибыль</div>
+                            <div class="kpi-value" id="scenario-current">₽0</div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-label">Прогноз прибыли</div>
+                            <div class="kpi-value" id="scenario-projected">₽0</div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-label">Изменение</div>
+                            <div class="kpi-value" id="scenario-change">0%</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <h3>📊 Сравнение сценариев</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="scenarioChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="history" class="tab-content">
+            <div style="padding: 25px; height: calc(100vh - 250px); overflow-y: auto; min-height: 700px;">
+                <h3>📜 История расчетов</h3>
+                <div id="history-list" class="history-list">
+                    <p style="color: #666; text-align: center; padding: 40px;">История пуста. Сохраните первый расчет!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="saveModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>💾 Сохранить расчет</h3>
+                <span class="modal-close" onclick="closeSaveModal()">&times;</span>
+            </div>
+            <form class="save-form" onsubmit="confirmSave(event)">
+                <input type="text" id="saveName" placeholder="Название расчета" required>
+                <input type="text" id="saveDescription" placeholder="Описание (опционально)">
+                <p style="font-size: 12px; color: #666; margin: 10px 0;">⚠️ Данные сохраняются только на время текущей сессии</p>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Сохранить</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="loadModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>📂 Загрузить расчет</h3>
+                <span class="modal-close" onclick="closeLoadModal()">&times;</span>
+            </div>
+            <div id="load-list" class="history-list">
+                <p style="color: #666; text-align: center; padding: 40px;">Нет сохраненных расчетов</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Глобальные переменные
+        let currentData = {};
+        let history = [        // Пересчитываем прибыль для демо-данных
+        history[0].profit = calculateMetrics(history[0].data).netProfit;
+        let profitChart, funnelChart, channelsChart, scenarioChart, roiChart;
+
+        // Каналы и их настройки
+        const channels = {
+            habr: { name: 'Хабр', type: 'organic' },
+            pikabu: { name: 'Пикабу', type: 'organic' },
+            vc: { name: 'VC', type: 'organic' },
+            tproger: { name: 'tProger', type: 'organic' },
+            proglib: { name: 'Proglib', type: 'organic' },
+            instagram_organic: { name: 'Instagram (органика)', type: 'organic' },
+            instagram: { name: 'Instagram (реклама)', type: 'paid' },
+            leadmagnet: { name: 'Лид-магнит', type: 'direct' },
+            other: { name: 'Другие', type: 'direct' }
+        };
+
+        function formatNumber(num) {
+            return Math.round(num).toLocaleString('ru-RU');
+        }
+
+        function getInputValues() {
+            const data = {
+                channels: {},
+                convToPayment: parseFloat(document.getElementById('convToPayment').value) || 0,
+                convToPurchase: parseFloat(document.getElementById('convToPurchase').value) || 0,
+                avgCheck: parseFloat(document.getElementById('avgCheck').value) || 0,
+                otherIncome: parseFloat(document.getElementById('otherIncome').value) || 0,
+                opExpenses: parseFloat(document.getElementById('opExpenses').value) || 0,
+                subscriptions: parseFloat(document.getElementById('subscriptions').value) || 0,
+                taxRate: parseFloat(document.getElementById('taxes').value) || 0
+            };
+
+            // Собираем данные по каналам
+            Object.keys(channels).forEach(channel => {
+                data.channels[channel] = {
+                    coverage: parseFloat(document.getElementById(channel).value) || 0,
+                    conversion: parseFloat(document.getElementById(channel + '_conv').value) || 0,
+                    cost: channel === 'instagram' ? (parseFloat(document.getElementById(channel + '_cost').value) || 0) : 0
+                };
+            });
+
+            return data;
+        }
+
+        function calculateChannelMetrics(data) {
+            const channelMetrics = {};
+            let totalTraffic = 0;
+            let totalSales = 0;
+
+            Object.keys(channels).forEach(channel => {
+                const channelData = data.channels[channel];
+                const traffic = channelData.coverage * channelData.conversion / 100;
+                const visitorsToPayment = traffic * data.convToPayment / 100;
+                const sales = visitorsToPayment * data.convToPurchase / 100;
+                const revenue = sales * data.avgCheck;
+                const cost = channelData.cost || 0;
+                const profit = revenue - cost;
+                const roi = cost > 0 ? ((revenue - cost) / cost * 100) : (revenue > 0 ? Infinity : 0);
+
+                channelMetrics[channel] = {
+                    name: channels[channel].name,
+                    type: channels[channel].type,
+                    coverage: channelData.coverage,
+                    conversion: channelData.conversion,
+                    traffic: traffic,
+                    sales: sales,
+                    revenue: revenue,
+                    cost: cost,
+                    profit: profit,
+                    roi: roi
+                };
+
+                totalTraffic += traffic;
+                totalSales += sales;
+            });
+
+            return { channelMetrics, totalTraffic, totalSales };
+        }
+
+        function calculateMetrics(data) {
+            const { channelMetrics, totalTraffic, totalSales } = calculateChannelMetrics(data);
+            
+            const totalRevenue = totalSales * data.avgCheck + data.otherIncome;
+            const totalAdCosts = Object.values(channelMetrics).reduce((sum, ch) => sum + ch.cost, 0);
+            const taxes = totalRevenue * data.taxRate / 100;
+            const totalExpenses = data.opExpenses + data.subscriptions + totalAdCosts + taxes;
+            const netProfit = totalRevenue - totalExpenses;
+            const roi = totalExpenses > 0 ? ((totalRevenue - totalExpenses) / totalExpenses * 100) : 0;
+
+            return {
+                channelMetrics,
+                totalTraffic,
+                totalSales,
+                totalRevenue,
+                totalExpenses,
+                netProfit,
+                roi,
+                totalAdCosts,
+                taxes
+            };
+        }
+
+        function calculate() {
+            currentData = getInputValues();
+            const metrics = calculateMetrics(currentData);
+            
+            // Обновляем KPI
+            document.getElementById('kpi-profit').textContent = `₽${formatNumber(metrics.netProfit)}`;
+            document.getElementById('kpi-roi').textContent = `${Math.round(metrics.roi)}%`;
+            document.getElementById('kpi-traffic').textContent = formatNumber(metrics.totalTraffic);
+            document.getElementById('kpi-sales').textContent = formatNumber(metrics.totalSales);
+            
+            // Строим дерево
+            updateTree(metrics);
+            
+            // Обновляем графики
+            updateCharts(metrics);
+            
+            // Обновляем таблицу ROI
+            updateROITable(metrics);
+            
+            // Обновляем сценарии
+            updateScenarios();
+        }
+
+        function updateTree(metrics) {
+            let channelTreeNodes = '';
+            Object.entries(metrics.channelMetrics).forEach(([key, channel]) => {
+                if (channel.traffic > 0) {
+                    channelTreeNodes += `
+                        <div class="tree-node level-4">
+                            <span>
+                                <strong>${channel.name}</strong>
+                                <div class="node-formula">${formatNumber(channel.coverage)} охватов × ${channel.conversion}% CTR = ${formatNumber(channel.traffic)} кликов</div>
+                            </span>
+                            <span class="node-value">${formatNumber(channel.traffic)} чел.</span>
+                        </div>
+                    `;
+                }
+            });
+
+            const tree = `
+                <div class="tree-node level-0 result-highlight">
+                    <span>
+                        <strong>Чистая прибыль за период</strong>
+                        <div class="node-formula">Общий доход - Общие расходы</div>
+                    </span>
+                    <span class="node-value">₽${formatNumber(metrics.netProfit)}</span>
+                </div>
+                
+                <div class="tree-node level-1">
+                    <span>
+                        <strong>Общий доход</strong>
+                        <div class="node-formula">Доход с продаж + Доход с других продуктов</div>
+                    </span>
+                    <span class="node-value">₽${formatNumber(metrics.totalRevenue)}</span>
+                </div>
+                
+                <div class="tree-node level-2">
+                    <span>
+                        <strong>Доход с продаж</strong>
+                        <div class="node-formula">Количество продаж × Средний чек</div>
+                    </span>
+                    <span class="node-value">₽${formatNumber(metrics.totalSales * currentData.avgCheck)}</span>
+                </div>
+                
+                <div class="tree-node level-3">
+                    <span>
+                        <strong>Количество продаж</strong>
+                        <div class="node-formula">Нажали "Купить" × Конверсия оплаты (${currentData.convToPurchase}%)</div>
+                    </span>
+                    <span class="node-value">${formatNumber(metrics.totalSales)}</span>
+                </div>
+                
+                <div class="tree-node level-4">
+                    <span>
+                        <strong>Нажали кнопку "Купить"</strong>
+                        <div class="node-formula">${formatNumber(metrics.totalTraffic)} посетителей × ${currentData.convToPayment}%</div>
+                    </span>
+                    <span class="node-value">${formatNumber(metrics.totalTraffic * currentData.convToPayment / 100)} чел.</span>
+                </div>
+                
+                <div class="tree-node level-3">
+                    <span>
+                        <strong>Общий трафик на сайт</strong>
+                        <div class="node-formula">Сумма трафика по всем каналам</div>
+                    </span>
+                    <span class="node-value">${formatNumber(metrics.totalTraffic)}</span>
+                </div>
+                
+                ${channelTreeNodes}
+                
+                <div class="tree-node level-2">
+                    <span>
+                        <strong>Доход с других продуктов</strong>
+                    </span>
+                    <span class="node-value">₽${formatNumber(currentData.otherIncome)}</span>
+                </div>
+                
+                <div class="tree-node level-1">
+                    <span>
+                        <strong>Общие расходы</strong>
+                        <div class="node-formula">Операционные + Подписки + Реклама + Налоги</div>
+                    </span>
+                    <span class="node-value">₽${formatNumber(metrics.totalExpenses)}</span>
+                </div>
+                
+                <div class="tree-node level-2">
+                    <span>Операционные расходы</span>
+                    <span class="node-value">₽${formatNumber(currentData.opExpenses)}</span>
+                </div>
+                
+                <div class="tree-node level-2">
+                    <span>Подписки</span>
+                    <span class="node-value">₽${formatNumber(currentData.subscriptions)}</span>
+                </div>
+                
+                <div class="tree-node level-2">
+                    <span>Затраты на рекламу</span>
+                    <span class="node-value">₽${formatNumber(metrics.totalAdCosts)}</span>
+                </div>
+                
+                <div class="tree-node level-2">
+                    <span>Налоги (${currentData.taxRate}% от дохода)</span>
+                    <span class="node-value">₽${formatNumber(metrics.taxes)}</span>
+                </div>
+            `;
+            
+            document.getElementById('tree').innerHTML = tree;
+            
+            // Анимация изменений
+            document.querySelectorAll('.tree-node').forEach(node => {
+                node.classList.add('animate-change');
+                setTimeout(() => node.classList.remove('animate-change'), 500);
+            });
+        }
+
+        function updateROITable(metrics) {
+            let tableHTML = `
+                <div class="roi-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Канал</th>
+                                <th>Охват</th>
+                                <th>Клики (CTR)</th>
+                                <th>Продажи</th>
+                                <th>Доход</th>
+                                <th>Затраты</th>
+                                <th>Прибыль</th>
+                                <th>ROI</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+
+            Object.entries(metrics.channelMetrics).forEach(([key, channel]) => {
+                if (channel.coverage > 0) {
+                    const roiClass = channel.roi > 0 ? 'roi-positive' : 'roi-negative';
+                    const roiText = channel.roi === Infinity ? '∞' : `${Math.round(channel.roi)}%`;
+                    
+                    tableHTML += `
+                        <tr>
+                            <td>${channel.name}</td>
+                            <td>${formatNumber(channel.coverage)}</td>
+                            <td>${formatNumber(channel.traffic)} (${channel.conversion}%)</td>
+                            <td>${formatNumber(channel.sales)}</td>
+                            <td>₽${formatNumber(channel.revenue)}</td>
+                            <td>₽${formatNumber(channel.cost)}</td>
+                            <td>₽${formatNumber(channel.profit)}</td>
+                            <td class="${roiClass}">${roiText}</td>
+                        </tr>
+                    `;
+                }
+            });
+
+            tableHTML += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+
+            document.getElementById('roi-table-container').innerHTML = tableHTML;
+        }
+
+        function updateCharts(metrics) {
+            const ctx1 = document.getElementById('profitChart');
+            const ctx2 = document.getElementById('funnelChart');
+            const ctx3 = document.getElementById('channelsChart');
+            const ctx4 = document.getElementById('roiChart');
+            
+            // График прибыли
+            if (profitChart) profitChart.destroy();
+            profitChart = new Chart(ctx1, {
+                type: 'line',
+                data: {
+                    labels: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн'],
+                    datasets: [{
+                        label: 'Прибыль',
+                        data: [
+                            metrics.netProfit * 0.7,
+                            metrics.netProfit * 0.8,
+                            metrics.netProfit * 0.9,
+                            metrics.netProfit,
+                            metrics.netProfit * 1.1,
+                            metrics.netProfit * 1.2
+                        ],
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+            
+            // Воронка конверсий по каналам
+            if (funnelChart) funnelChart.destroy();
+            const channelNames = [];
+            const channelTraffic = [];
+            const channelSales = [];
+            
+            Object.entries(metrics.channelMetrics).forEach(([key, channel]) => {
+                if (channel.coverage > 0) {
+                    channelNames.push(channel.name);
+                    channelTraffic.push(channel.traffic);
+                    channelSales.push(channel.sales);
+                }
+            });
+            
+            funnelChart = new Chart(ctx2, {
+                type: 'bar',
+                data: {
+                    labels: channelNames,
+                    datasets: [{
+                        label: 'Трафик',
+                        data: channelTraffic,
+                        backgroundColor: 'rgba(102, 126, 234, 0.6)'
+                    }, {
+                        label: 'Продажи',
+                        data: channelSales,
+                        backgroundColor: 'rgba(76, 175, 80, 0.6)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+            
+            // Эффективность каналов
+            if (channelsChart) channelsChart.destroy();
+            channelsChart = new Chart(ctx3, {
+                type: 'doughnut',
+                data: {
+                    labels: channelNames,
+                    datasets: [{
+                        data: channelTraffic,
+                        backgroundColor: [
+                            '#667eea',
+                            '#764ba2',
+                            '#4caf50',
+                            '#ff9800',
+                            '#f44336',
+                            '#e91e63',
+                            '#9c27b0',
+                            '#3f51b5'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+
+            // График ROI по каналам
+            if (ctx4) {
+                if (roiChart) roiChart.destroy();
+                const roiData = [];
+                const roiLabels = [];
+                
+                Object.entries(metrics.channelMetrics).forEach(([key, channel]) => {
+                    if (channel.coverage > 0 && channel.roi !== Infinity) {
+                        roiLabels.push(channel.name);
+                        roiData.push(Math.round(channel.roi));
+                    }
+                });
+                
+                roiChart = new Chart(ctx4, {
+                    type: 'bar',
+                    data: {
+                        labels: roiLabels,
+                        datasets: [{
+                            label: 'ROI %',
+                            data: roiData,
+                            backgroundColor: roiData.map(roi => roi >= 0 ? 'rgba(76, 175, 80, 0.6)' : 'rgba(244, 67, 54, 0.6)')
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        function updateScenarios() {
+            const baseMetrics = calculateMetrics(currentData);
+            
+            const organicGrowth = parseFloat(document.getElementById('organic-growth').value) / 100;
+            const adBudgetChange = parseFloat(document.getElementById('ad-budget').value) / 100;
+            const conversionChange = parseFloat(document.getElementById('conversion-change').value) / 100;
+            const checkChange = parseFloat(document.getElementById('check-change').value) / 100;
+            
+            // Создаем модифицированные данные
+            const scenarioData = JSON.parse(JSON.stringify(currentData));
+            
+            // Модифицируем органические каналы
+            Object.keys(channels).forEach(channel => {
+                if (channels[channel].type === 'organic') {
+                    scenarioData.channels[channel].coverage *= (1 + organicGrowth);
+                }
+                if (channels[channel].type === 'paid') {
+                    scenarioData.channels[channel].coverage *= (1 + adBudgetChange);
+                    scenarioData.channels[channel].cost *= (1 + adBudgetChange);
+                }
+                scenarioData.channels[channel].conversion *= (1 + conversionChange);
+            });
+            
+            scenarioData.avgCheck *= (1 + checkChange);
+            // Налоги автоматически пересчитаются от нового дохода
+            
+            const scenarioMetrics = calculateMetrics(scenarioData);
+            
+            // Обновляем UI
+            document.getElementById('scenario-current').textContent = `₽${formatNumber(baseMetrics.netProfit)}`;
+            document.getElementById('scenario-projected').textContent = `₽${formatNumber(scenarioMetrics.netProfit)}`;
+            const change = baseMetrics.netProfit !== 0 ? 
+                ((scenarioMetrics.netProfit - baseMetrics.netProfit) / Math.abs(baseMetrics.netProfit) * 100) : 0;
+            document.getElementById('scenario-change').textContent = `${change > 0 ? '+' : ''}${change.toFixed(1)}%`;
+            
+            // График сценариев
+            const ctx = document.getElementById('scenarioChart');
+            if (scenarioChart) scenarioChart.destroy();
+            scenarioChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Текущий', 'Прогноз'],
+                    datasets: [{
+                        label: 'Прибыль',
+                        data: [baseMetrics.netProfit, scenarioMetrics.netProfit],
+                        backgroundColor: ['rgba(102, 126, 234, 0.8)', 'rgba(76, 175, 80, 0.8)']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+            
+            if (tabName === 'analytics' || tabName === 'roi' || tabName === 'scenarios') {
+                setTimeout(() => {
+                    calculate();
+                }, 100);
+            } else if (tabName === 'history') {
+                updateHistoryList();
+            }
+        }
+
+        function saveData() {
+            document.getElementById('saveModal').style.display = 'flex';
+        }
+
+        function closeSaveModal() {
+            document.getElementById('saveModal').style.display = 'none';
+        }
+
+        function confirmSave(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('saveName').value;
+            const description = document.getElementById('saveDescription').value;
+            const data = getInputValues();
+            const metrics = calculateMetrics(data);
+            
+            const saveItem = {
+                id: Date.now(),
+                name,
+                description,
+                date: new Date().toLocaleDateString('ru-RU'),
+                data,
+                metrics,
+                profit: metrics.netProfit
+            };
+            
+            history.unshift(saveItem);
+            
+            closeSaveModal();
+            alert('Расчет успешно сохранен!');
+        }
+
+        function loadDataModal() {
+            updateLoadList();
+            document.getElementById('loadModal').style.display = 'flex';
+        }
+
+        function closeLoadModal() {
+            document.getElementById('loadModal').style.display = 'none';
+        }
+
+        function updateLoadList() {
+            const loadList = document.getElementById('load-list');
+            
+            if (history.length === 0) {
+                loadList.innerHTML = '<p style="color: #666; text-align: center; padding: 40px;">Нет сохраненных расчетов</p>';
+                return;
+            }
+            
+            loadList.innerHTML = history.map(item => `
+                <div class="history-item" onclick="loadCalculation(${item.id})">
+                    <div>
+                        <strong>${item.name}</strong>
+                        <div class="history-date">${item.date}</div>
+                        ${item.description ? `<div style="font-size: 12px; color: #666;">${item.description}</div>` : ''}
+                    </div>
+                    <div class="history-profit">₽${formatNumber(item.profit)}</div>
+                </div>
+            `).join('');
+        }
+
+        function updateHistoryList() {
+            const historyList = document.getElementById('history-list');
+            
+            if (history.length === 0) {
+                historyList.innerHTML = '<p style="color: #666; text-align: center; padding: 40px;">История пуста. Сохраните первый расчет!</p>';
+                return;
+            }
+            
+            historyList.innerHTML = history.map(item => `
+                <div class="history-item" onclick="loadCalculation(${item.id})">
+                    <div>
+                        <strong>${item.name}</strong>
+                        <div class="history-date">${item.date}</div>
+                        ${item.description ? `<div style="font-size: 12px; color: #666;">${item.description}</div>` : ''}
+                    </div>
+                    <div class="history-profit">₽${formatNumber(item.profit)}</div>
+                </div>
+            `).join('');
+        }
+
+        function loadCalculation(id) {
+            const item = history.find(h => h.id === id);
+            if (!item) return;
+            
+            // Загружаем основные данные
+            document.getElementById('convToPayment').value = item.data.convToPayment;
+            document.getElementById('convToPurchase').value = item.data.convToPurchase;
+            document.getElementById('avgCheck').value = item.data.avgCheck;
+            document.getElementById('otherIncome').value = item.data.otherIncome;
+            document.getElementById('opExpenses').value = item.data.opExpenses;
+            document.getElementById('subscriptions').value = item.data.subscriptions;
+            document.getElementById('taxes').value = item.data.taxRate || 6;
+            
+            // Загружаем данные по каналам
+            if (item.data.channels) {
+                Object.keys(item.data.channels).forEach(channel => {
+                    if (document.getElementById(channel)) {
+                        document.getElementById(channel).value = item.data.channels[channel].coverage;
+                    }
+                    if (document.getElementById(channel + '_conv')) {
+                        document.getElementById(channel + '_conv').value = item.data.channels[channel].conversion;
+                    }
+                    if (channel === 'instagram' && item.data.channels[channel].cost && document.getElementById(channel + '_cost')) {
+                        document.getElementById(channel + '_cost').value = item.data.channels[channel].cost;
+                    }
+                });
+            }
+            
+            calculate();
+            closeLoadModal();
+            
+            // Переключаемся на вкладку калькулятора
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.querySelector('.tab').classList.add('active');
+            document.getElementById('calculator').classList.add('active');
+        }
+
+        // Обработчики для слайдеров сценариев
+        document.getElementById('organic-growth').addEventListener('input', function() {
+            document.getElementById('organic-growth-value').textContent = this.value + '%';
+            updateScenarios();
+        });
+
+        document.getElementById('ad-budget').addEventListener('input', function() {
+            document.getElementById('ad-budget-value').textContent = this.value + '%';
+            updateScenarios();
+        });
+
+        document.getElementById('conversion-change').addEventListener('input', function() {
+            document.getElementById('conversion-change-value').textContent = this.value + '%';
+            updateScenarios();
+        });
+
+        document.getElementById('check-change').addEventListener('input', function() {
+            document.getElementById('check-change-value').textContent = this.value + '%';
+            updateScenarios();
+        });
+
+        // Добавляем обработчики событий для всех полей ввода
+        document.querySelectorAll('input[type="number"]').forEach(input => {
+            input.addEventListener('input', calculate);
+        });
+
+        // Закрытие модальных окон по клику вне
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+            }
+        }
+
+        // Первоначальный расчет
+        calculate();
+        updateHistoryList();
+    </script>
+</body>
+</html>
