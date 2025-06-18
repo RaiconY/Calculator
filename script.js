@@ -4,6 +4,19 @@
         // if (history[0]) history[0].profit = calculateMetrics(history[0].data).netProfit;
         let profitChart, funnelChart, channelsChart, scenarioChart, roiChart;
 
+        // Загрузка сценариев из localStorage или установка значений по умолчанию
+        const defaultScenarios = [
+            {
+                name: 'Базовый рост',
+                values: { organicGrowth: 20, adBudget: 10, conversionChange: 5, checkChange: 0 }
+            },
+            {
+                name: 'Экспансия',
+                values: { organicGrowth: 100, adBudget: 100, conversionChange: 20, checkChange: 10 }
+            }
+        ];
+        let scenarios = ScenarioManager.initScenarios(defaultScenarios);
+
         // Каналы и их настройки
         const channels = {
             habr: { name: 'Хабр', type: 'organic' },
@@ -481,10 +494,51 @@
             });
         }
 
+        function updateScenarioSelect() {
+            const select = document.getElementById('scenario-select');
+            if (!select) return;
+            select.innerHTML = scenarios.map((s, i) => `<option value="${i}">${s.name}</option>`).join('');
+        }
+
+        function loadSelectedScenario() {
+            const select = document.getElementById('scenario-select');
+            const idx = parseInt(select.value);
+            const scenario = scenarios[idx];
+            if (!scenario) return;
+
+            document.getElementById('organic-growth').value = scenario.values.organicGrowth;
+            document.getElementById('organic-growth-value').textContent = scenario.values.organicGrowth + '%';
+            document.getElementById('ad-budget').value = scenario.values.adBudget;
+            document.getElementById('ad-budget-value').textContent = scenario.values.adBudget + '%';
+            document.getElementById('conversion-change').value = scenario.values.conversionChange;
+            document.getElementById('conversion-change-value').textContent = scenario.values.conversionChange + '%';
+            document.getElementById('check-change').value = scenario.values.checkChange;
+            document.getElementById('check-change-value').textContent = scenario.values.checkChange + '%';
+
+            updateScenarios();
+        }
+
+        function saveCurrentScenario() {
+            const name = prompt('Название сценария');
+            if (!name) return;
+
+            const values = {
+                organicGrowth: parseFloat(document.getElementById('organic-growth').value) || 0,
+                adBudget: parseFloat(document.getElementById('ad-budget').value) || 0,
+                conversionChange: parseFloat(document.getElementById('conversion-change').value) || 0,
+                checkChange: parseFloat(document.getElementById('check-change').value) || 0
+            };
+
+            ScenarioManager.saveScenario(scenarios, name, values);
+            updateScenarioSelect();
+            const index = scenarios.findIndex(s => s.name === name);
+            document.getElementById('scenario-select').value = index;
+        }
+
         function switchTab(event, tabName) {
             document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-
+            
             event.target.classList.add('active');
             document.getElementById(tabName).classList.add('active');
             
@@ -639,6 +693,9 @@
             updateScenarios();
         });
 
+        // Выбор сохраненного сценария
+        document.getElementById('scenario-select').addEventListener('change', loadSelectedScenario);
+
         // Добавляем обработчики событий для всех полей ввода
         document.querySelectorAll('input[type="number"]').forEach(input => {
             input.addEventListener('input', calculate);
@@ -654,3 +711,8 @@
         // Первоначальный расчет
         calculate();
         updateHistoryList();
+        updateScenarioSelect();
+        if (document.getElementById('scenario-select').options.length > 0) {
+            document.getElementById('scenario-select').value = 0;
+            loadSelectedScenario();
+        }
