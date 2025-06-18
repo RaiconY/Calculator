@@ -4,6 +4,19 @@
         // if (history[0]) history[0].profit = calculateMetrics(history[0].data).netProfit;
         let profitChart, funnelChart, channelsChart, scenarioChart, roiChart;
 
+        // Загрузка сценариев из localStorage или установка значений по умолчанию
+        const defaultScenarios = [
+            {
+                name: 'Базовый рост',
+                values: { organicGrowth: 20, adBudget: 10, conversionChange: 5, checkChange: 0 }
+            },
+            {
+                name: 'Экспансия',
+                values: { organicGrowth: 100, adBudget: 100, conversionChange: 20, checkChange: 10 }
+            }
+        ];
+        let scenarios = ScenarioManager.initScenarios(defaultScenarios);
+
         // Каналы и их настройки
         const channels = {
             habr: { name: 'Хабр', type: 'organic' },
@@ -481,7 +494,48 @@
             });
         }
 
-        function switchTab(tabName) {
+        function updateScenarioSelect() {
+            const select = document.getElementById('scenario-select');
+            if (!select) return;
+            select.innerHTML = scenarios.map((s, i) => `<option value="${i}">${s.name}</option>`).join('');
+        }
+
+        function loadSelectedScenario() {
+            const select = document.getElementById('scenario-select');
+            const idx = parseInt(select.value);
+            const scenario = scenarios[idx];
+            if (!scenario) return;
+
+            document.getElementById('organic-growth').value = scenario.values.organicGrowth;
+            document.getElementById('organic-growth-value').textContent = scenario.values.organicGrowth + '%';
+            document.getElementById('ad-budget').value = scenario.values.adBudget;
+            document.getElementById('ad-budget-value').textContent = scenario.values.adBudget + '%';
+            document.getElementById('conversion-change').value = scenario.values.conversionChange;
+            document.getElementById('conversion-change-value').textContent = scenario.values.conversionChange + '%';
+            document.getElementById('check-change').value = scenario.values.checkChange;
+            document.getElementById('check-change-value').textContent = scenario.values.checkChange + '%';
+
+            updateScenarios();
+        }
+
+        function saveCurrentScenario() {
+            const name = prompt('Название сценария');
+            if (!name) return;
+
+            const values = {
+                organicGrowth: parseFloat(document.getElementById('organic-growth').value) || 0,
+                adBudget: parseFloat(document.getElementById('ad-budget').value) || 0,
+                conversionChange: parseFloat(document.getElementById('conversion-change').value) || 0,
+                checkChange: parseFloat(document.getElementById('check-change').value) || 0
+            };
+
+            ScenarioManager.saveScenario(scenarios, name, values);
+            updateScenarioSelect();
+            const index = scenarios.findIndex(s => s.name === name);
+            document.getElementById('scenario-select').value = index;
+        }
+
+        function switchTab(event, tabName) {
             document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
             
@@ -618,6 +672,77 @@
             document.getElementById('calculator').classList.add('active');
         }
 
+        // Если история пуста, добавляем предзаполненные примеры
+        if (history.length === 0) {
+            const todayData = {
+                channels: {
+                    habr: { coverage: 24000, conversion: 5, cost: 0 },
+                    pikabu: { coverage: 4000, conversion: 4, cost: 0 },
+                    vc: { coverage: 1000, conversion: 2.5, cost: 0 },
+                    tproger: { coverage: 0, conversion: 0, cost: 0 },
+                    proglib: { coverage: 0, conversion: 0, cost: 0 },
+                    instagram_organic: { coverage: 3000, conversion: 1.5, cost: 0 },
+                    instagram: { coverage: 0, conversion: 0, cost: 0 },
+                    leadmagnet: { coverage: 0, conversion: 0, cost: 0 },
+                    other: { coverage: 0, conversion: 0, cost: 0 }
+                },
+                convToPayment: 1.2,
+                convToPurchase: 80,
+                avgCheck: 4990,
+                otherIncome: 0,
+                opExpenses: 0,
+                subscriptions: 0,
+                taxRate: 6
+            };
+
+            const goalData = {
+                channels: {
+                    habr: { coverage: 124000, conversion: 5, cost: 0 },
+                    pikabu: { coverage: 114000, conversion: 4, cost: 0 },
+                    vc: { coverage: 20000, conversion: 2.5, cost: 0 },
+                    tproger: { coverage: 20000, conversion: 2.5, cost: 0 },
+                    proglib: { coverage: 20000, conversion: 2.5, cost: 0 },
+                    instagram_organic: { coverage: 600000, conversion: 1.5, cost: 0 },
+                    instagram: { coverage: 100000, conversion: 2, cost: 50000 },
+                    leadmagnet: { coverage: 0, conversion: 0, cost: 0 },
+                    other: { coverage: 0, conversion: 0, cost: 0 }
+                },
+                convToPayment: 2.5,
+                convToPurchase: 70,
+                avgCheck: 4990,
+                otherIncome: 0,
+                opExpenses: 0,
+                subscriptions: 0,
+                taxRate: 6
+            };
+
+            const todayMetrics = calculateMetrics(todayData);
+            const todayItem = {
+                id: Date.now(),
+                name: 'Цифры на сегодня',
+                description: '',
+                date: new Date().toLocaleDateString('ru-RU'),
+                data: todayData,
+                metrics: todayMetrics,
+                profit: todayMetrics.netProfit
+            };
+
+            const goalMetrics = calculateMetrics(goalData);
+            const goalItem = {
+                id: Date.now() + 1,
+                name: 'Цель',
+                description: '',
+                date: new Date().toLocaleDateString('ru-RU'),
+                data: goalData,
+                metrics: goalMetrics,
+                profit: goalMetrics.netProfit
+            };
+
+            history.push(todayItem, goalItem);
+            localStorage.setItem('history', JSON.stringify(history));
+            loadCalculation(todayItem.id);
+        }
+
         // Обработчики для слайдеров сценариев
         document.getElementById('organic-growth').addEventListener('input', function() {
             document.getElementById('organic-growth-value').textContent = this.value + '%';
@@ -639,6 +764,9 @@
             updateScenarios();
         });
 
+        // Выбор сохраненного сценария
+        document.getElementById('scenario-select').addEventListener('change', loadSelectedScenario);
+
         // Добавляем обработчики событий для всех полей ввода
         document.querySelectorAll('input[type="number"]').forEach(input => {
             input.addEventListener('input', calculate);
@@ -654,3 +782,8 @@
         // Первоначальный расчет
         calculate();
         updateHistoryList();
+        updateScenarioSelect();
+        if (document.getElementById('scenario-select').options.length > 0) {
+            document.getElementById('scenario-select').value = 0;
+            loadSelectedScenario();
+        }
