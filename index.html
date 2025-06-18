@@ -10,7 +10,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>Калькулятор бизнес-метрик Pro</h1>
+            <h1>Калькулятор бизнес-метрик</h1>
             <p>Полный анализ с индивидуальными конверсиями по каналам</p>
             <div class="header-actions">
                 <button class="btn btn-primary" onclick="saveData()">💾 Сохранить</button>
@@ -201,8 +201,10 @@
 
         <div id="analytics" class="tab-content">
             <div style="padding: 25px; height: calc(100vh - 160px); overflow-y: auto;">
-                <div class="chart-container">
-                    <h3>📈 Динамика прибыли по месяцам</h3>
+                <div class="chart-container" id="profitChartContainer">
+                    <h3>📈 Динамика прибыли по месяцам
+                        <button class="btn btn-secondary" id="toggleProfitChartBtn" onclick="toggleProfitChart()" style="margin-left:10px;">Скрыть</button>
+                    </h3>
                     <div class="chart-wrapper">
                         <canvas id="profitChart"></canvas>
                     </div>
